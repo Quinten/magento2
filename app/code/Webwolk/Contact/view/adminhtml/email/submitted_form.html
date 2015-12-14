@@ -1,0 +1,21 @@
+<!--
+/**
+ * Copyright © 2015 Webwolk. All rights reserved.
+ * See LICENSE for license details.
+ */
+-->
+<!--@subject Contact Form@-->
+<!--@vars {
+"var data.comment":"Comment",
+"var data.email":"Sender Email",
+"var data.name":"Sender Name",
+"var data.telephone":"Sender Telephone"
+} @-->
+
+{{trans "Naam: %name" name=$data.name}}
+{{trans "Email: %email" email=$data.email}}
+{{trans "Telefoon: %telephone" telephone=$data.telephone}}
+{{trans "Straat en nummer: %address" =$data.address}}
+{{trans "Postcode en gemeente: %city" city=$data.city}}
+
+{{trans "Bericht: %comment" comment=$data.comment}}
