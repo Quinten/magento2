@@ -1,0 +1,3 @@
+[submodule "app/design/frontend/Webwolk/supernapietheme"]
+	path = app/design/frontend/Webwolk/supernapietheme
+	url = git@github.com:Quinten/supernapietheme.git
