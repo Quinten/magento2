@@ -1,3 +1,6 @@
 [submodule "app/design/frontend/Webwolk/supernapietheme"]
 	path = app/design/frontend/Webwolk/supernapietheme
 	url = git@github.com:Quinten/supernapietheme.git
+[submodule "app/code/Webwolk/Contact"]
+	path = app/code/Webwolk/Contact
+	url = git@github.com:Quinten/Contact.git
