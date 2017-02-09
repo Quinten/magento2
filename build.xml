@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="magento2" default="phpunit">
+    <!-- ****************************** -->
+    <!-- DEV TASKS                      -->
+    <!-- Mainly used by Quinten to run following tasks: ant clean-var, ant clean-static, ant source-theme (followed by grunt watch) -->
+    <!-- ****************************** -->
+
+    <!-- install project dependencies with composer -->
+    <target name="composer" description="install composer dependencies">
+        <exec executable="composer" failonerror="true">
+            <arg value="install" />
+        </exec>
+    </target>
+
+    <!-- install local grunt part -->
+    <target name="local-install-grunt" description="install project local part of grunt">
+        <exec executable="npm">
+            <arg value="install" />
+            <arg value="grunt" />
+            <arg value="--save-dev" />
+        </exec>
+        <exec executable="npm">
+            <arg value="install" />
+        </exec>
+    </target>
+
+    <!-- clean when php development is being done -->
+    <target name="clean-php" description="remove cache and generate">
+        <delete dir="var/di" />
+        <delete dir="var/generation" />
+    </target>
+
+    <!-- clean when cms, or block or admin changed settings -->
+    <target name="clean-cms" description="remove cached cms, block, ...">
+        <delete dir="var/cache" />
+        <delete dir="var/page_cache" />
+    </target>
+
+    <!-- clean static frontend -->
+    <target name="clean-static-front" description="cleanup generated static files">
+        <delete dir="pub/static/frontend" />
+        <delete dir="pub/static/_requirejs" />
+    </target>
+
+    <!-- clean static adminhtml -->
+    <target name="clean-static-admin" description="cleanup generated static files">
+        <delete dir="pub/static/adminhtml" />
+        <delete dir="pub/static/_requirejs" />
+    </target>
+
+    <!-- clean static generated files -->
+    <target name="clean-static" description="cleanup generated static files"
+        depends="clean-static-front,clean-static-admin" />
+
+    <!-- clean the logfiles -->
+    <target name="clean-log" description="cleanup logfiles">
+        <delete file="var/log/debug.log" />
+        <delete file="var/log/system.log" />
+    </target>
+
+    <!-- clean when frontend has been changed -->
+    <target name="clean-frontend" description="remove page_cache, generated"
+        depends="clean-cms" >
+        <delete dir="var/view_preprocessed" />
+    </target>
+
+    <!-- clean static files frontend theme and preprocessed, ideal for small css changes -->
+    <target name="clean-css" description="cleanup for small css changes">
+        <delete dir="pub/static/frontend" />
+        <delete dir="var/view_preprocessed" />
+    </target>
+
+    <!-- clean static files frontend, preprocessed and _requirejs, ideal for js changes -->
+    <target name="clean-js" description="cleanup for js changes"
+        depends="clean-cms,clean-css">
+        <delete dir="pub/static/_requirejs" />
+    </target>
+
+    <!-- clean when module was installed, removed, disabled -->
+    <target name="clean-module" description="clean most"
+        depends="clean-php,clean-cms" />
+
+    <!-- clean entire var folder -->
+    <target name="clean-var" description="remove all files from var"
+        depends="clean-php,clean-frontend,clean-log">
+        <delete dir="var/tmp" />
+    </target>
+
+    <target name="clean-media-cache" description="remove media cache">
+        <delete dir="pub/media/catalog/cache" />
+    </target>
+
+    <target name="clean-all" description="clean all"
+        depends="clean-var,clean-static" />
+
+    <!-- dependency injection compile -->
+    <target name="compile-di" description="compile di (php)"
+        depends="clean-php" >
+        <exec executable="${basedir}/bin/magento">
+            <arg value="setup:di:compile" />
+        </exec>
+    </target>
+
+    <!-- deploy static content -->
+    <target name="deploy-static" description="rebuild all static content">
+        <exec executable="${basedir}/bin/magento">
+            <arg value="setup:static-content:deploy" />
+            <arg value="en_US" />
+            <arg value="nl_NL" />
+        </exec>
+    </target>
+
+    <!-- source-theme -->
+    <target name="source-theme" description="prepare less files for grunt watch">
+        <exec executable="${basedir}/bin/magento">
+            <arg value="dev:source-theme:deploy" />
+            <arg value="--theme=Webwolk/supernapietheme" />
+            <arg value="--locale=nl_NL" />
+            <arg value="css/styles-m" />
+            <arg value="css/styles-l" />
+            <arg value="css/print" />
+        </exec>
+    </target>
+
+    <target name="prepare-theme" description="clean all"
+        depends="clean-var,clean-static,clean-js,source-theme" />
+
+        <!-- create database for this project -->
+    <target name="create-database" description="create new database">
+        <exec executable="mysql">
+            <arg value="-uroot" />
+            <arg value="-ptoor" />
+            <arg value="-e" />
+            <arg value="CREATE DATABASE IF NOT EXISTS `supernapie` DEFAULT CHARSET utf8;" />
+        </exec>
+    </target>
+
+    <!-- fresh magento install -->
+    <target name="install" description="install magento2 on this box"
+        depends="create-database">
+        <exec executable="${basedir}/bin/magento">
+            <arg value="setup:install" />
+            <arg value="--db-host=127.0.0.1" />
+            <arg value="--db-name=supernapie" />
+            <arg value="--db-user=root" />
+            <arg value="--db-password=toor" />
+            <arg value="--backend-frontname=admin" />
+            <arg value="--base-url=http://supernapie.dev" />
+            <arg value="--language=nl_NL" /> <!-- no nl_BE available -->
+            <arg value="--currency=EUR" />
+            <arg value="--timezone=Europe/Brussels" />
+            <arg value="--admin-lastname=napie" />
+            <arg value="--admin-firstname=super" />
+            <arg value="--admin-email=test@supernapie.be" />
+            <arg value="--admin-user=admin" />
+            <arg value="--admin-password=Supernapie...123" />
+            <arg value="--use-secure=0" />
+            <arg value="--use-rewrites=1" />
+            <arg value="--use-secure-admin=0" />
+            <arg value="--session-save=files" />
+        </exec>
+    </target>
+
+    <!-- ****************************** -->
+    <!-- BUILD TASKS                    -->
+    <!-- ****************************** -->
+    <!-- run unittests -->
+    <target name="phpunit" description="PHPUnit testing" depends="composer">
+        <exec executable="${basedir}/vendor/bin/phpunit" failonerror="true">
+            <arg value="--configuration=dev/tests/unit/phpunit.xml.dist"/>
+            <arg value="--log-junit=${basedir}/test-reports/junit.xml"/>
+        </exec>
+    </target>
+</project>
