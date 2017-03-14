@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="optimus" default="phpunit">
+
+    <!-- create database for this project -->
+    <target name="create-database" description="create new database">
+        <exec executable="mysql">
+            <arg value="-uroot" />
+            <arg value="-ptoor" />
+            <arg value="-e" />
+            <arg value="CREATE DATABASE IF NOT EXISTS `optimus` DEFAULT CHARSET utf8;" />
+        </exec>
+    </target>
+
+    <!-- fresh magento install -->
+    <target name="install" description="install magento2 on this box" depends="create-database">
+        <exec executable="${basedir}/bin/magento">
+            <arg value="setup:install" />
+            <arg value="--db-host=127.0.0.1" />
+            <arg value="--db-name=optimus" />
+            <arg value="--db-user=root" />
+            <arg value="--db-password=toor" />
+            <arg value="--backend-frontname=backend" />
+            <arg value="--base-url=http://optimus.dev" />
+            <arg value="--language=nl_NL" /> <!-- no nl_BE available -->
+            <arg value="--currency=EUR" />
+            <arg value="--timezone=Europe/Brussels" />
+            <arg value="--admin-lastname=Prime" />
+            <arg value="--admin-firstname=Optimus" />
+            <arg value="--admin-email=prime.optimus@domain.com" />
+            <arg value="--admin-user=optimus" />
+            <arg value="--admin-password=Prime2000!" />
+            <arg value="--use-secure=0" />
+            <arg value="--use-rewrites=1" />
+            <arg value="--use-secure-admin=0" />
+            <arg value="--session-save=files" />
+        </exec>
+    </target>
+
+</project>
