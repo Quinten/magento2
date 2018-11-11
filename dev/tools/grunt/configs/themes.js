@@ -41,6 +41,16 @@ module.exports = {
         ],
         dsl: 'less'
     },
+    supernapie: {
+        area: 'frontend',
+        name: 'Webwolk/supernapietheme',
+        locale: 'nl_NL',
+        files: [
+            'css/styles-m',
+            'css/styles-l'
+        ],
+        dsl: 'less'
+    },
     backend: {
         area: 'adminhtml',
         name: 'Magento/backend',
